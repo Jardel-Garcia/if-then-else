@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Se-então-senão: O Jogo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+	a:link {
+            color: #0f0;
+        }
+
+        a:visited {
+            color: #0f0;
+        }
+
+        a:hover {
+            color: white;
+        }
+
+        a:active {
+            color: #0f0;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            border: 2px solid #0f0;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            font-size: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #0f0;
+        }
+
+        .humanity-low {
+            color: #f00;
+        }
+
+        .humanity-medium {
+            color: #ff0;
+        }
+
+        .story-display {
+            border: 2px solid #0f0;
+            padding: 30px;
+            margin-bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            min-height: 400px;
+            position: relative;
+        }
+
+        .story-text {
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .choice-button {
+            width: 100%;
+            border: 2px solid #0f0;
+            background-color: #000;
+            color: #0f0;
+            padding: 20px;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .choice-button:hover {
+            background-color: #0f0;
+            color: #000;
+        }
+
+        .choice-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .reset-button {
+            border-color: #f00;
+            color: #f00;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .reset-button:hover {
+            background-color: #f00;
+            color: #000;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+
+        .audio-module {
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: rgba(0,0,0,0.8);
+            font-size: 12px;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0px,
+                rgba(0,0,0,0) 2px,
+                rgba(0,0,0,0.15) 3px
+            );
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+
+        <div class="header-top">
+            <div>
+                <span class="icon">▶</span>
+                <span style="font-size: 12px;">SISTEMA_OPERACIONAL_VIDA.exe</span>
+            </div>
+            <div id="humanity-display">
+                <span class="icon">♥</span>
+                <span>HUMANIDADE: <span id="humanity-value">100</span>%</span>
+            </div>
+        </div>
+
+        <div class="metrics">
+            <div>CLIQUES: <span id="clicks-value">0</span></div>
+            <div>SCORE: <span id="score-value">4.5</span>⭐</div>
+            <div>DIA: <span id="days-value">1</span></div>
+            <div>BUGS: <span id="bugs-value">0</span></div>
+        </div>
+    </div>
+
+    <!-- Story Display -->
+    <div class="story-display">
+        <div class="story-text" id="story-text"></div>
+    </div>
+
+    <!-- Choices -->
+    <div class="choices" id="choices-container"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>SE-ENTÃO-SENÃO © 2025 | Baseado no conto de mesmo nome por Jardel Garcia < <a
+                href="https://linktr.ee/_jardelgarcia_" target="_blank">@_jardelgarcia_</a> > </p>
+        <p style="margin-top: 3px;">Sugestão: dê um play no álbum abaixo, uma trilha sonora perfeita para essa narrativa
+            (além de ser sua principal referência).</p>
+        <br>
+        <div id="audio-module"  class="hidden">
+            <div class="audio-module">
+                <div>> MÓDULO_DE_ÁUDIO.carregado</div>
+                <div>> Trilha recomendada para execução da narrativa</div>
+                <iframe style="border-radius:12px;margin-top:10px;"
+                        data-testid="embed-iframe"
+                        src="https://open.spotify.com/embed/album/6ldSMLVCxIzdVXuLspsDJo?utm_source=generator&theme=0"
+                        width="100%" height="152" frameBorder="0" allowfullscreen=""
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    // Estado do jogo
+    let currentNode = 'start';
+    let audioActivated = false;
+    let metrics = {
+        clicks: 0,
+        score: 4.5,
+        days: 1,
+        bugs: 0,
+        humanity: 100
+    };
+    let isTyping = false;
+    let typingInterval = null;
+
+    // História do jogo
+    const story = {
+        start: {
+            text: `> SISTEMA INICIANDO...\n> CARREGANDO ROTINA DIÁRIA\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\nSE levanto às cinco, ENTÃO sei que o dia valerá à pena.\nSENÃO, trato logo de me depurar.\n\nVocê acorda. O despertador marca 05:47.\n\nO QUE FAZER?`,
+            choices: [
+                { text: 'EXECUTAR: Levantar imediatamente', next: 'late_wake', effect: { humanity: -5 } },
+                { text: 'EXECUTAR: Depuração necessária', next: 'self_punish', effect: { humanity: -10 } }
+            ]
+        },
+        late_wake: {
+            text: `> FALHA DETECTADA: +47 MINUTOS\n> INICIANDO COMPENSAÇÃO...\n\nVocê está atrasado. Sua esposa está na cozinha.\nEla abre a boca para falar.\n\nPROCESSAR INPUT?`,
+            choices: [
+                { text: 'IF (primeira_reclamacao) THEN reservar_memoria()', next: 'listen_wife', effect: { humanity: -5 } },
+                { text: 'ELSE encerrar_fluxo()', next: 'ignore_wife', effect: { humanity: -10 } }
+            ]
+        },
+        self_punish: {
+            text: `> EXECUTANDO AUTO-DEPURAÇÃO...\n> PUNIÇÃO: -1 CAFÉ\n> SISTEMAS OTIMIZADOS\n\nVocê se força a fazer flexões até sentir dor.\nO dia pode continuar agora.\n\nSua esposa está na cozinha, silenciosa.`,
+            choices: [
+                { text: 'CONTINUAR > Ir trabalhar', next: 'drive_work', effect: { clicks: 100, humanity: -5 } }
+            ]
+        },
+        listen_wife: {
+            text: `> ALOCANDO MEMÓRIA...\n> PROCESSANDO TORRENTE DE DADOS...\n\n"Você nunca me escuta de verdade..."\n"Sempre com esse trabalho..."\n"As crianças nem te veem mais..."\n\n> BUFFER OVERFLOW EM 3... 2... 1...\n\nVocê está no terceiro café.`,
+            choices: [
+                { text: 'EXECUTAR: Sair_para_trabalho()', next: 'drive_work', effect: { humanity: -8, clicks: 50 } }
+            ]
+        },
+        ignore_wife: {
+            text: `> FLUXO ENCERRADO\n> MEMÓRIA NÃO ALOCADA\n> +7 MINUTOS ÚTEIS GANHOS\n\nVocê coloca o podcast e segue para o carro.\nAs placas de PARE debocham de você.\n\n"SE as pessoas só param, ENTÃO eu acho uma loucura."\n\nUma angústia agarra sua garganta.`,
+            choices: [
+                { text: 'EXECUTAR: Acelerar(20%)', next: 'drive_work', effect: { humanity: -10, clicks: 150 } }
+            ]
+        },
+        drive_work: {
+            text: `> CHEGADA: EMPRESA\n> INÍCIO DE MÊS DETECTADO\n> PROTOCOLO: AVALIAÇÃO\n\nVocê verifica seu e-mail.\nRelatório de ponto: ⭐⭐⭐⭐½\n\n> DECEPÇÃO.EXE RODANDO...\n\nPrecisa sair 1 minuto mais cedo hoje para acertar o ponto.\nMas primeiro: vai ter depuração de gente.`,
+            choices: [
+                { text: 'OBSERVAR: Demissões pela sala de vidro', next: 'watch_firing', effect: { humanity: -15, clicks: 200 } }
+            ]
+        },
+        watch_firing: {
+            text: `> VOCÊ É SÊNIOR. SER SÊNIOR É MARAVILHOSO.\n\nVocê pega café e observa através do vidro.\nTrouxas incompetentes sendo demitidos.\nA nuvem negra de derrota deles faz você rir.\n\n> SCORE ATUALIZADO: 10.247 CLIQUES/DIA\n> INSÍGNIA DESBLOQUEADA: OURO\n\n"Deus me livre dessa gente atrasada."\n\nUm bug te espera no código.`,
+            choices: [
+                { text: 'WHILE (bug_exists) { trabalhar() }', next: 'bug_work', effect: { bugs: 1, clicks: 300, humanity: -5 } }
+            ]
+        },
+        bug_work: {
+            text: `> ITERAÇÃO: 7h59min\n> BUG PERSISTE\n> CAFÉ RESTANTE: 2/8\n\nO bug não se resolve.\nMas você precisa corrigir seu ponto.\n\nSeu celular vibra: mensagem de Iara.\n"E aí? Hoje tem?"`,
+            choices: [
+                { text: 'EXECUTAR: protocolo_iara(30min)', next: 'iara_meet', effect: { humanity: -20 } },
+                { text: 'RETURN: resolver_bug_primeiro()', next: 'keep_working', effect: { humanity: -10, bugs: 1 } }
+            ]
+        },
+        iara_meet: {
+            text: `> ENVIANDO MENSAGEM PARA ESPOSA: "Vou fazer hora extra"\n> AJUSTANDO TIMER: 30 MINUTOS\n> INICIANDO PROTOCOLO...\n\nVocê pula algumas partes. Vai direto pra recursão.\nIara gosta, você sabe.\nSe cansa antes do ponto de parada.\n\nO timer toca. Iara desce sem falar nada.\nMelhor assim.`,
+            choices: [
+                { text: 'RETURN: para_casa()', next: 'dinner_scene', effect: { humanity: -10, clicks: 100 } }
+            ]
+        },
+        keep_working: {
+            text: `> PRIORIDADE: BUG_CRÍTICO\n> OVERRIDE: COMPROMISSOS_PESSOAIS\n\nVocê ignora a mensagem de Iara.\nO bug é mais importante.\nMais 3 horas se passam.\n\nAinda não resolveu.`,
+            choices: [
+                { text: 'EXECUTAR: voltar_para_casa()', next: 'dinner_scene', effect: { bugs: 1, clicks: 400, humanity: -8 } }
+            ]
+        },
+        dinner_scene: {
+            text: `> JANTAR.EXE INICIADO\n\nSua filha: "Terminei com o namorado."\nVocê: "Não eram compatíveis, né?"\nEla: "Exatamente, pai."\n\n> HERANÇA CONFIRMADA ✓\n\nSeu filho mal toca na comida. Um objeto sem forma.\n"Como foi seu dia?" você tenta.\nEle não responde.\n\n"Um dia ele aprende a ser útil."`,
+            choices: [
+                { text: 'EXECUTAR: fingir_banho()', next: 'fake_bathroom', effect: { humanity: -15 } },
+                { text: 'TRY: conversar_com_filho()', next: 'failed_connection', effect: { humanity: -8 } }
+            ]
+        },
+        fake_bathroom: {
+            text: `> SIMULANDO: NECESSIDADE_BANHO\n> FUNÇÃO REAL: alivio_pessoal()\n\nCelular no mudo. A mulher pode vir atrás.\nVocê se apressa.\n\nDEPOIS: Batalhar com aquele maldito bug.\nVocê abre o notebook e registra entrada no sistema.\n\n> FUNCIONÁRIO EXEMPLAR`,
+            choices: [
+                { text: 'WHILE (tempo < meia_noite) { trabalhar() }', next: 'midnight_work', effect: { clicks: 500, bugs: 1, humanity: -10 } }
+            ]
+        },
+        failed_connection: {
+            text: `> TENTANDO CONEXÃO...\n> TIMEOUT: SEM RESPOSTA\n> ERRO: PROTOCOLO INCOMPATÍVEL\n\nVocê senta ao lado dele.\n"Que música é essa?"\nEle nem tira o fone. Continua no celular.\n\nVocê desiste. Claro.\nÉ tarde demais para isso.\n\n> CONEXÃO FALHOU ✗\n> RETORNANDO AO TRABALHO`,
+            choices: [
+                { text: 'EXECUTAR: voltar_ao_trabalho()', next: 'midnight_work', effect: { humanity: -12, clicks: 500 } }
+            ]
+        },
+        midnight_work: {
+            text: `> DIA ${getDayText()}\n> ${23 + Math.floor(Math.random() * 2)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}\n\nSua esposa vem te chamar. Você diz:\n"Dormir 8 horas é perder um terço da vida."\n"O meu maior medo é que a gente não dure", ela responde.\n\n> SENTIMENTALISMO DETECTADO\n> IGNORANDO...\n\n${metrics.bugs > 0 ? 'O bug ainda resiste.' : 'Você está próximo da solução.'}`,
+            choices: [
+                { text: metrics.bugs > 0 ? 'USAR: ferramentas_IA()' : 'CONTINUAR: até_resolver()', next: metrics.bugs > 0 ? 'ai_solution' : 'day_loop', effect: { clicks: 400, days: 1, humanity: -8 } }
+            ]
+        },
+        ai_solution: {
+            text: `> RECURSO: IA_ASSISTANT\n> COPIANDO... COLANDO...\n> BUG RESOLVIDO ✓\n\nO sol nasce.\nVocê não dormiu.\n8 horas que todo mundo desperdiçou.\nVocê otimizou.\n\n> SCORE ATUALIZADO: +${1000 + Math.floor(Math.random() * 500)} CLIQUES`,
+            choices: [
+                { text: 'CONTINUAR > Próximo dia', next: 'day_loop', effect: { clicks: 1500, bugs: -1, days: 1, humanity: -10 } }
+            ]
+        },
+        day_loop: {
+            text: `> DIA ${getDayText()}\n> ROTINA.EXE EXECUTANDO...\n\nMesmo jantar.\nMesma angústia.\nMesmos números.\nMesmos cliques.\n\n${metrics.days >= 10 ? '> ALERTA: SINTOMAS FÍSICOS DETECTADOS\n' : ''}${metrics.days >= 13 ? '> ERRO: TONTURA CRÍTICA\n' : ''}\n${metrics.days < 14 ? 'E de novo. E de novo. E de novo.' : 'O décimo quarto dia chegou.'}`,
+            choices: metrics.days < 14 ? [
+                { text: 'LOOP: repetir()', next: 'day_loop', effect: { clicks: 2000, days: +1, humanity: -5 } },
+                { text: 'TRY: tentar_mudança()', next: 'try_change', effect: { humanity: -8 } }
+            ] : [
+                { text: 'VERIFICAR: meta_status()', next: 'meta_day', effect: { clicks: 1000, humanity: -5 } }
+            ]
+        },
+        try_change: {
+            text: `> TENTANDO NOVO FLUXO...\n> DESVIO DO PROTOCOLO PADRÃO\n\nVocê elogia a comida.\nAcaricia a mão dela.\nEla te olha séria, desconfiada.\n\nMas você vê: ela gostou.\n\nMais tarde, você a abraça por trás.\nO corpo rígido se amolece.\nEla pousa a cabeça no seu ombro.\n\nFicam assim. Tempo demais pro seu gosto.\n\nAí ela sente o perfume de Iara.`,
+            choices: [
+                { text: 'EXECUTAR: explicação()', next: 'confrontation', effect: { humanity: -15 } },
+                { text: 'ABORT: sem_resposta()', next: 'confrontation', effect: { humanity: -20 } }
+            ]
+        },
+        confrontation: {
+            text: `> SISTEMA EM CONFLITO\n\n"Quem é a vagabunda dessa vez?!"\n\nVocê tira a camisa. Batom. Perfume.\n"Nosso casamento parece um filme ruim", ela diz.\n"Sabe o que é pior? Eu te amei esse tempo todo achando que você se importaria."\n\nVocê conta alguns segundos:\n"Só tem um erro de sintaxe na sua frase.\nVocê não precisa me amar o tempo todo."\n\nEla balança a cabeça. Banho. Remédios. Dorme.\n\n> PROTOCOLO MANTIDO\n> MUDANÇA: CANCELADA`,
+            choices: [
+                { text: 'CONTINUAR: ao_trabalho()', next: 'meta_day', effect: { humanity: -25, days: 1 } }
+            ]
+        },
+        meta_day: {
+            text: `> DIA 14\n> VERIFICANDO SCORE...\n> META: 15 DIAS\n> VOCÊ FIXOU: 14 DIAS\n\nNinguém pediu. Mas você fixou.\nOs números confirmam: você conseguiu.\nOlhares invejosos na sala de café.\n\n> FUNCIONÁRIO OURO ✓\n\nVocê está eufórico.\nMerece até 10 minutos a mais com Iara.\n\nMas à noite, algo está errado.`,
+            choices: [
+                { text: 'CONTINUAR: celebration()', next: 'breakdown', effect: { clicks: 3000, humanity: -10 } }
+            ]
+        },
+        breakdown: {
+            text: `> ERRO: TONTURA CRÍTICA\n> AVISO: SISTEMA INSTÁVEL\n> ALERTA: SOBRECARGA\n\nA sala gira.\nVocê se apoia na mesa.\nQuatro comprimidos de uma vez.\nRespirações do influenciador.\n\nSe recostar um pouco?\nVocê deita.\nFecha os olhos.\n\nE a solução do bug vem!\nComo mágica!\n\nVocê se levanta rápido.\nRápido demais.`,
+            choices: [
+                { text: 'EXECUTAR: abrir_notebook()', next: 'collapse', effect: { clicks: 5000, humanity: -15 } }
+            ]
+        },
+        collapse: {
+            text: `> SISTEMA CRÍTICO\n> FREQUÊNCIA CARDÍACA: ${180 + Math.floor(Math.random() * 40)} BPM\n> VISÃO: COMPROMETIDA\n> EQUILÍBRIO: FALHA\n\nVocê vê vultos borrados.\nAlguém bate no vidro.\n"Bando de gente chata!"\n\nO e-mail abre.\nVocê vê de relance—\n\n> > > CONEXÃO PERDIDA < < <\n\nCâmera lenta.\nCorpo contra o chão.\nVozes abafadas.\nImagens de TV antiga.\n\n> SUA PILHA ESTOUROU`,
+            choices: [
+                { text: 'EXECUTAR: reiniciar()', next: 'restart_ending', effect: {} }
+            ]
+        },
+        restart_ending: {
+            text: `> REINICIANDO SISTEMA...\n> CARREGANDO ROTINA...\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\n...\n\nVocê acorda.\nO despertador marca 05:00.\n\nTudo de novo.\nE de novo.\nE de novo.\nE de novo.\n\n> LOOP INFINITO DETECTADO\n> NÃO HÁ BREAK\n> NÃO HÁ RETURN\n> SÓ REPEAT\n\n━━━━━━━━━━━━━━━━━━━━━\n   GAME OVER\n   NÃO HÁ SAÍDA\n━━━━━━━━━━━━━━━━━━━━━`,
+            choices: []
+        }
+    };
+
+    function getDayText() {
+        return metrics.days < 14 ? metrics.days + '/14' : '14 - META ALCANÇADA';
+    }
+
+    function updateMetrics() {
+        document.getElementById('clicks-value').textContent = metrics.clicks.toLocaleString();
+        document.getElementById('score-value').textContent = metrics.score;
+        document.getElementById('days-value').textContent = metrics.days;
+        document.getElementById('bugs-value').textContent = metrics.bugs;
+
+        const humanityValue = document.getElementById('humanity-value');
+        const humanityDisplay = document.getElementById('humanity-display');
+        humanityValue.textContent = metrics.humanity;
+
+        humanityDisplay.className = '';
+        if (metrics.humanity < 30) {
+            humanityDisplay.classList.add('humanity-low');
+        } else if (metrics.humanity < 60) {
+            humanityDisplay.classList.add('humanity-medium');
+        }
+    }
+
+    function typeText(text, callback) {
+        const storyText = document.getElementById('story-text');
+        storyText.innerHTML = '';
+        isTyping = true;
+        let index = 0;
+
+        typingInterval = setInterval(() => {
+            if (index < text.length) {
+                storyText.textContent = text.slice(0, index + 1);
+                index++;
+            } else {
+                clearInterval(typingInterval);
+                isTyping = false;
+                if (callback) callback();
+            }
+        }, 20);
+    }
+
+    function renderChoices() {
+        const choicesContainer = document.getElementById('choices-container');
+        choicesContainer.innerHTML = '';
+
+        const currentStory = story[currentNode];
+
+        if (currentStory.choices.length === 0) {
+            const resetBtn = document.createElement('button');
+            resetBtn.className = 'choice-button reset-button';
+            resetBtn.innerHTML = '<span class="icon">⟲</span><span>EXECUTAR: reiniciar_jogo()</span>';
+            resetBtn.onclick = resetGame;
+            choicesContainer.appendChild(resetBtn);
+            return;
+        }
+
+        currentStory.choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.className = 'choice-button';
+            button.innerHTML = `<span class="icon">▶</span><span>${choice.text}</span>`;
+            button.onclick = () => handleChoice(choice);
+            button.disabled = isTyping;
+            choicesContainer.appendChild(button);
+        });
+    }
+
+    function handleChoice(choice) {
+
+        if (!audioActivated) {
+            setTimeout(() => {
+                document.getElementById('audio-module').classList.remove('hidden');
+            }, 1500);
+            audioActivated = true;
+        }
+        if (isTyping) {
+            clearInterval(typingInterval);
+            const currentStory = story[currentNode];
+            document.getElementById('story-text').textContent = currentStory.text;
+            isTyping = false;
+            renderChoices();
+            return;
+        }
+
+        if (choice.effect.clicks) metrics.clicks += choice.effect.clicks;
+        if (choice.effect.days) metrics.days += choice.effect.days;
+        if (choice.effect.bugs !== undefined) metrics.bugs += choice.effect.bugs;
+        if (choice.effect.humanity) {
+            metrics.humanity = Math.max(0, Math.min(100, metrics.humanity + choice.effect.humanity));
+        }
+
+        updateMetrics();
+        currentNode = choice.next;
+        loadNode();
+    }
+
+    function loadNode() {
+        const currentStory = story[currentNode];
+        typeText(currentStory.text, () => {
+            renderChoices();
+        });
+    }
+
+    function resetGame() {
+        currentNode = 'start';
+        metrics = {
+            clicks: 0,
+            score: 4.5,
+            days: 1,
+            bugs: 0,
+            humanity: 100
+        };
+        updateMetrics();
+        loadNode();
+    }
+
+    // Inicializar jogo
+    updateMetrics();
+    loadNode();
+</script>
+</body>
+</html>
