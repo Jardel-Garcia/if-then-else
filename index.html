@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Se-então-senão: O Jogo</title>
+    <title>Se-então-senão: conto interativo</title>
     <style>
         * {
             margin: 0;
@@ -184,9 +184,269 @@
                 rgba(0,0,0,0.15) 3px
             );
         }
+
+        /* SPLASH SCREEN */
+        #splash-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.96);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+
+        #splash-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-modal {
+            border: 2px solid #0f0;
+            padding: 50px 60px;
+            text-align: center;
+            max-width: 520px;
+            width: 90%;
+            background-color: #000;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.15), 0 0 80px rgba(0, 255, 0, 0.05);
+            position: relative;
+        }
+
+        .splash-modal::before {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            pointer-events: none;
+        }
+
+        .splash-title {
+            font-size: 22px;
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+            color: #0f0;
+            text-transform: uppercase;
+        }
+
+        .splash-subtitle {
+            font-size: 11px;
+            color: rgba(0, 255, 0, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+        }
+
+        .splash-loading {
+            font-size: 11px;
+            color: rgba(0, 255, 0, 0.6);
+            margin-bottom: 30px;
+            min-height: 60px;
+        }
+
+        .splash-loading-line {
+            margin: 4px 0;
+            opacity: 0;
+            animation: fadeInLine 0.4s forwards;
+        }
+
+        @keyframes fadeInLine {
+            to { opacity: 1; }
+        }
+
+        .splash-bar-wrapper {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 255, 0, 0.15);
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+
+        .splash-bar {
+            height: 100%;
+            background: #0f0;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .splash-start-btn {
+            display: none;
+            border: 2px solid #0f0;
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+            padding: 16px 40px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            animation: pulseBtn 2s infinite;
+        }
+
+        .splash-start-btn:hover {
+            background: #0f0;
+            color: #000;
+            animation: none;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { box-shadow: 0 0 0px rgba(0,255,0,0); }
+            50% { box-shadow: 0 0 16px rgba(0,255,0,0.5); }
+        }
+
+        .splash-warning {
+            font-size: 10px;
+            color: rgba(0, 255, 0, 0.35);
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* CINEFORUM SVG LOGO */
+        .cineforum-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .cineforum-wrap svg {
+            filter: drop-shadow(0 0 4px #0f0) drop-shadow(0 0 10px rgba(0,255,0,0.4));
+        }
+        .cineforum-label {
+            font-size: 9px;
+            letter-spacing: 3px;
+            color: rgba(0, 255, 0, 0.5);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .cineforum-wrap-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 8px 0 4px;
+            opacity: 0.75;
+        }
+        .cineforum-wrap-footer svg {
+            filter: drop-shadow(0 0 3px #0f0) drop-shadow(0 0 6px rgba(0,255,0,0.3));
+        }
+        .cineforum-label-footer {
+            font-size: 8px;
+            letter-spacing: 3px;
+            color: rgba(0, 255, 0, 0.45);
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash-overlay">
+
+    <!-- TELA 1: clique para ativar -->
+    <div id="splash-activate" onclick="activateAudio()" style="
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        cursor: pointer;
+    ">
+        <div style="font-size: 11px; letter-spacing: 3px; color: rgba(0,255,0,0.4); margin-bottom: 28px;">
+            SE-ENTÃO-SENÃO · v1.0.0
+        </div>
+        <div id="activate-prompt" style="
+            font-size: 13px; letter-spacing: 2px;
+            color: #0f0;
+            animation: pulseBtn 1.4s infinite;
+        ">
+            &gt; CLIQUE EM QUALQUER LUGAR PARA ATIVAR O SISTEMA
+        </div>
+        <div style="font-size: 10px; color: rgba(0,255,0,0.3); margin-top: 18px; letter-spacing: 1px;">
+            ⚠ &nbsp;inclui efeitos sonoros
+        </div>
+    </div>
+
+    <!-- TELA 2: loading (oculta inicialmente) -->
+    <div id="splash-modal" class="splash-modal" style="display:none;">
+
+        <div class="cineforum-wrap">
+            <!-- Cineforum SVG logo — câmera de cinema dentro de balão de fala, verde neon -->
+            <svg width="72" height="72" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Balão de fala como path único: retângulo com cantos arredondados
+                     e ponta integrada saindo do canto inferior esquerdo -->
+                <path d="M9,4 H86 Q91,4 91,9 V66 Q91,71 86,71 H34 L14,91 L20,71 H9 Q4,71 4,66 V9 Q4,4 9,4 Z"
+                      stroke="#00ff00" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+
+                <!-- Corpo principal da câmera -->
+                <rect x="22" y="30" width="42" height="28" rx="2"
+                      stroke="#00ff00" stroke-width="2.2" fill="none"/>
+
+                <!-- Painel esquerdo (grade/filtro) -->
+                <rect x="24" y="33" width="12" height="16" rx="1"
+                      stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <line x1="27" y1="33" x2="27" y2="49" stroke="#00ff00" stroke-width="1"/>
+                <line x1="30" y1="33" x2="30" y2="49" stroke="#00ff00" stroke-width="1"/>
+                <line x1="33" y1="33" x2="33" y2="49" stroke="#00ff00" stroke-width="1"/>
+
+                <!-- Janela central (visor/filme) -->
+                <rect x="38" y="32" width="16" height="18" rx="1"
+                      stroke="#00ff00" stroke-width="2" fill="none"/>
+                <!-- dois pontos dentro do visor -->
+                <circle cx="43" cy="41" r="2" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="49" cy="41" r="2" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+
+                <!-- Lente / holofote à direita -->
+                <polyline points="64,34 76,28 76,50 64,46"
+                          stroke="#00ff00" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+
+                <!-- Suporte/base da câmera -->
+                <line x1="30" y1="58" x2="60" y2="58" stroke="#00ff00" stroke-width="2.2"/>
+                <line x1="35" y1="58" x2="35" y2="62" stroke="#00ff00" stroke-width="2"/>
+                <line x1="55" y1="58" x2="55" y2="62" stroke="#00ff00" stroke-width="2"/>
+                <line x1="28" y1="62" x2="62" y2="62" stroke="#00ff00" stroke-width="2"/>
+
+                <!-- Rolo esquerdo -->
+                <circle cx="34" cy="22" r="9" stroke="#00ff00" stroke-width="2.2" fill="none"/>
+                <circle cx="34" cy="22" r="4" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="34" cy="15" r="1.5" fill="#00ff00"/>
+                <circle cx="34" cy="29" r="1.5" fill="#00ff00"/>
+                <circle cx="27" cy="22" r="1.5" fill="#00ff00"/>
+                <circle cx="41" cy="22" r="1.5" fill="#00ff00"/>
+
+                <!-- Rolo direito -->
+                <circle cx="56" cy="22" r="9" stroke="#00ff00" stroke-width="2.2" fill="none"/>
+                <circle cx="56" cy="22" r="4" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="56" cy="15" r="1.5" fill="#00ff00"/>
+                <circle cx="56" cy="29" r="1.5" fill="#00ff00"/>
+                <circle cx="49" cy="22" r="1.5" fill="#00ff00"/>
+                <circle cx="63" cy="22" r="1.5" fill="#00ff00"/>
+
+                <!-- Haste esquerda da câmera -->
+                <line x1="10" y1="44" x2="22" y2="44" stroke="#00ff00" stroke-width="2"/>
+                <rect x="7" y="42" width="4" height="4" rx="1" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+            </svg>
+            <div class="cineforum-label">EDITORA COLETIVO CINE-FORUM</div>
+        </div>
+
+        <div class="splash-title">SE-ENTÃO-SENÃO</div>
+        <div class="splash-subtitle">CONTO INTERATIVO · v1.0.0</div>
+		<div class="splash-subtitle">· JARDEL GARCIA ·</div>
+
+        <div class="splash-loading" id="splash-log"></div>
+
+        <div class="splash-bar-wrapper">
+            <div class="splash-bar" id="splash-bar"></div>
+        </div>
+
+        <button class="splash-start-btn" id="splash-btn" onclick="startGame()">
+            ▶ &nbsp;INICIAR
+        </button>
+
+        <div class="splash-warning" id="splash-warn">
+            ⚠ &nbsp;Ative o som para a experiência completa
+        </div>
+    </div>
+
+</div>
+
 <div class="container">
     <!-- Header -->
     <div class="header">
@@ -194,7 +454,7 @@
         <div class="header-top">
             <div>
                 <span class="icon">▶</span>
-                <span style="font-size: 12px;">SISTEMA_OPERACIONAL_VIDA.exe</span>
+                <span style="font-size: 12px;">SISTEMA_OPERACIONAL_VITAL.exe</span>
             </div>
             <div id="humanity-display">
                 <span class="icon">♥</span>
@@ -222,8 +482,46 @@
     <div class="footer">
         <p>SE-ENTÃO-SENÃO © 2025 | Baseado no conto de mesmo nome por Jardel Garcia < <a
                 href="https://linktr.ee/_jardelgarcia_" target="_blank">@_jardelgarcia_</a> > </p>
+        <div class="cineforum-wrap-footer">
+            <svg width="36" height="38" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9,4 H86 Q91,4 91,9 V66 Q91,71 86,71 H34 L14,91 L20,71 H9 Q4,71 4,66 V9 Q4,4 9,4 Z"
+                      stroke="#00ff00" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
+                <rect x="22" y="30" width="42" height="28" rx="2"
+                      stroke="#00ff00" stroke-width="2.2" fill="none"/>
+                <rect x="24" y="33" width="12" height="16" rx="1"
+                      stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <line x1="27" y1="33" x2="27" y2="49" stroke="#00ff00" stroke-width="1"/>
+                <line x1="30" y1="33" x2="30" y2="49" stroke="#00ff00" stroke-width="1"/>
+                <line x1="33" y1="33" x2="33" y2="49" stroke="#00ff00" stroke-width="1"/>
+                <rect x="38" y="32" width="16" height="18" rx="1"
+                      stroke="#00ff00" stroke-width="2" fill="none"/>
+                <circle cx="43" cy="41" r="2" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="49" cy="41" r="2" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <polyline points="64,34 76,28 76,50 64,46"
+                          stroke="#00ff00" stroke-width="2.2" fill="none" stroke-linejoin="round"/>
+                <line x1="30" y1="58" x2="60" y2="58" stroke="#00ff00" stroke-width="2.2"/>
+                <line x1="35" y1="58" x2="35" y2="62" stroke="#00ff00" stroke-width="2"/>
+                <line x1="55" y1="58" x2="55" y2="62" stroke="#00ff00" stroke-width="2"/>
+                <line x1="28" y1="62" x2="62" y2="62" stroke="#00ff00" stroke-width="2"/>
+                <circle cx="34" cy="22" r="9" stroke="#00ff00" stroke-width="2.2" fill="none"/>
+                <circle cx="34" cy="22" r="4" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="34" cy="15" r="1.5" fill="#00ff00"/>
+                <circle cx="34" cy="29" r="1.5" fill="#00ff00"/>
+                <circle cx="27" cy="22" r="1.5" fill="#00ff00"/>
+                <circle cx="41" cy="22" r="1.5" fill="#00ff00"/>
+                <circle cx="56" cy="22" r="9" stroke="#00ff00" stroke-width="2.2" fill="none"/>
+                <circle cx="56" cy="22" r="4" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+                <circle cx="56" cy="15" r="1.5" fill="#00ff00"/>
+                <circle cx="56" cy="29" r="1.5" fill="#00ff00"/>
+                <circle cx="49" cy="22" r="1.5" fill="#00ff00"/>
+                <circle cx="63" cy="22" r="1.5" fill="#00ff00"/>
+                <line x1="10" y1="44" x2="22" y2="44" stroke="#00ff00" stroke-width="2"/>
+                <rect x="7" y="42" width="4" height="4" rx="1" stroke="#00ff00" stroke-width="1.5" fill="none"/>
+            </svg>
+            <div class="cineforum-label-footer">EDITORA COLETIVO CINE-FORUM</div>
+        </div>
         <br>
-        <div id="audio-module"  class="hidden">
+        <div id="audio-module" class="hidden">
             <div class="audio-module">
                 <div>> MÓDULO_DE_ÁUDIO.carregado</div>
                 <div>> Trilha recomendada para execução da narrativa</div>
@@ -338,10 +636,11 @@
             ]
         },
         midnight_work: {
-            text: `> DIA ${getDayText()}\n> ${23 + Math.floor(Math.random() * 2)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}\n\nSua esposa vem te chamar. Você diz:\n"Dormir 8 horas é perder um terço da vida."\n"O meu maior medo é que a gente não dure", ela responde.\n\n> SENTIMENTALISMO DETECTADO\n> IGNORANDO...\n\n${metrics.bugs > 0 ? 'O bug ainda resiste.' : 'Você está próximo da solução.'}`,
-            choices: [
+            getText: () => `> DIA ${getDayText()}\n> ${23 + Math.floor(Math.random() * 2)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}\n\nSua esposa vem te chamar. Você diz:\n"Dormir 8 horas é perder um terço da vida."\n"O meu maior medo é que a gente não dure", ela responde.\n\n> SENTIMENTALISMO DETECTADO\n> IGNORANDO...\n\n${metrics.bugs > 0 ? 'O bug ainda resiste.' : 'Você está próximo da solução.'}`,
+            get text() { return this.getText(); },
+            get choices() { return [
                 { text: metrics.bugs > 0 ? 'USAR: ferramentas_IA()' : 'CONTINUAR: até_resolver()', next: metrics.bugs > 0 ? 'ai_solution' : 'day_loop', effect: { clicks: 400, days: 1, humanity: -8 } }
-            ]
+            ]; }
         },
         ai_solution: {
             text: `> RECURSO: IA_ASSISTANT\n> COPIANDO... COLANDO...\n> BUG RESOLVIDO ✓\n\nO sol nasce.\nVocê não dormiu.\n8 horas que todo mundo desperdiçou.\nVocê otimizou.\n\n> SCORE ATUALIZADO: +${1000 + Math.floor(Math.random() * 500)} CLIQUES`,
@@ -350,13 +649,14 @@
             ]
         },
         day_loop: {
-            text: `> DIA ${getDayText()}\n> ROTINA.EXE EXECUTANDO...\n\nMesmo jantar.\nMesma angústia.\nMesmos números.\nMesmos cliques.\n\n${metrics.days >= 10 ? '> ALERTA: SINTOMAS FÍSICOS DETECTADOS\n' : ''}${metrics.days >= 13 ? '> ERRO: TONTURA CRÍTICA\n' : ''}\n${metrics.days < 14 ? 'E de novo. E de novo. E de novo.' : 'O décimo quarto dia chegou.'}`,
-            choices: metrics.days < 14 ? [
+            getText: () => `> DIA ${getDayText()}\n> ROTINA.EXE EXECUTANDO...\n\nMesmo jantar.\nMesma angústia.\nMesmos números.\nMesmos cliques.\n\n${metrics.days >= 10 ? '> ALERTA: SINTOMAS FÍSICOS DETECTADOS\n' : ''}${metrics.days >= 13 ? '> ERRO: TONTURA CRÍTICA\n' : ''}\n${metrics.days < 14 ? 'E de novo. E de novo. E de novo.' : 'O décimo quarto dia chegou.'}`,
+            get text() { return this.getText(); },
+            get choices() { return metrics.days < 14 ? [
                 { text: 'LOOP: repetir()', next: 'day_loop', effect: { clicks: 2000, days: +1, humanity: -5 } },
                 { text: 'TRY: tentar_mudança()', next: 'try_change', effect: { humanity: -8 } }
             ] : [
                 { text: 'VERIFICAR: meta_status()', next: 'meta_day', effect: { clicks: 1000, humanity: -5 } }
-            ]
+            ]; }
         },
         try_change: {
             text: `> TENTANDO NOVO FLUXO...\n> DESVIO DO PROTOCOLO PADRÃO\n\nVocê elogia a comida.\nAcaricia a mão dela.\nEla te olha séria, desconfiada.\n\nMas você vê: ela gostou.\n\nMais tarde, você a abraça por trás.\nO corpo rígido se amolece.\nEla pousa a cabeça no seu ombro.\n\nFicam assim. Tempo demais pro seu gosto.\n\nAí ela sente o perfume de Iara.`,
@@ -390,13 +690,14 @@
             ]
         },
         restart_ending: {
-            text: `> REINICIANDO SISTEMA...\n> CARREGANDO ROTINA...\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\n...\n\nVocê acorda.\nO despertador marca 05:00.\n\nTudo de novo.\nE de novo.\nE de novo.\nE de novo.\n\n> LOOP INFINITO DETECTADO\n> NÃO HÁ BREAK\n> NÃO HÁ RETURN\n> SÓ REPEAT\n\n━━━━━━━━━━━━━━━━━━━━━\n   GAME OVER\n   NÃO HÁ SAÍDA\n━━━━━━━━━━━━━━━━━━━━━`,
+            text: `> REINICIANDO SISTEMA...\n> CARREGANDO ROTINA...\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\n...\n\nVocê acorda.\nO despertador marca 05:00.\n\nTudo de novo.\nE de novo.\nE de novo.\nE de novo.\n\n> LOOP INFINITO DETECTADO\n> NÃO HÁ BREAK\n> NÃO HÁ RETURN\n> SÓ REPEAT\n\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n☠ ☠ ☠  FATAL ERROR  ☠ ☠ ☠\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n\n�\x00\x00HEAP\x00DUMP\x00\x00█▓░\n✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝\n\n0xDEAD • 0xDEAD • 0xDEAD\n\n█▀▄▀█ ▄▀▀▄ █▀▀▄ ▀▀█▀▀\n▒░▒░▒░▒░▒░▒░▒░▒░▒░▒░▒\n\n         †\n\n> PROCESSO ENCERRADO\n> MEMÓRIA LIBERADA\n> USUÁRIO: NÃO ENCONTRADO`,
             choices: []
         }
     };
 
     function getDayText() {
-        return metrics.days < 14 ? metrics.days + '/14' : '14 - META ALCANÇADA';
+        const d = Math.min(metrics.days, 14);
+        return d < 14 ? d + '/14' : '14 - META ALCANÇADA';
     }
 
     function updateMetrics() {
@@ -426,6 +727,8 @@
         typingInterval = setInterval(() => {
             if (index < text.length) {
                 storyText.textContent = text.slice(0, index + 1);
+                // Som de digitação a cada 2 caracteres (igual à splash)
+                if (index % 2 === 0) playTypeBeep();
                 index++;
             } else {
                 clearInterval(typingInterval);
@@ -491,6 +794,7 @@
 
     function loadNode() {
         const currentStory = story[currentNode];
+        if (currentNode === 'restart_ending') playGameOver();
         typeText(currentStory.text, () => {
             renderChoices();
         });
@@ -509,10 +813,285 @@
         loadNode();
     }
 
+    // ── SPLASH SCREEN ────────────────────────────────────────────────
+    const splashLines = [
+        '> CARREGANDO SISTEMA_OPERACIONAL_VITAL.exe...',
+        '> ALOCANDO MEMÓRIA: rotina_diaria[]',
+        '> COMPILANDO: protocolo_se_entao_senao.c',
+        '> VERIFICANDO DEPENDÊNCIAS: cafe, ansiedade, ambicao',
+        '> INICIALIZANDO MÓDULO DE HUMANIDADE...',
+        '> AVISO: BUGS PODEM OCORRER',
+        '> SISTEMA PRONTO.'
+    ];
+
+    const logEl   = document.getElementById('splash-log');
+    const barEl   = document.getElementById('splash-bar');
+    const btnEl   = document.getElementById('splash-btn');
+    const warnEl  = document.getElementById('splash-warn');
+
+    // ── WEB AUDIO: sons de terminal ───────────────────────────────────
+    let audioCtx = null;
+
+    function getAudioCtx() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return audioCtx;
+    }
+
+    // Clique de teclado realista — ruído branco filtrado + transiente curto
+    function playTypeBeep() {
+        try {
+            const ctx     = getAudioCtx();
+            const now     = ctx.currentTime;
+
+            // Burst de ruído branco curtíssimo
+            const bufSize = Math.floor(ctx.sampleRate * 0.04);
+            const buffer  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data    = buffer.getChannelData(0);
+            for (let j = 0; j < bufSize; j++) data[j] = Math.random() * 2 - 1;
+
+            const source  = ctx.createBufferSource();
+            source.buffer = buffer;
+
+            // Filtro passa-banda: realça a faixa "clacky" (~3–8 kHz)
+            const filter       = ctx.createBiquadFilter();
+            filter.type        = 'bandpass';
+            filter.frequency.value = 1500 + Math.random() * 500;
+            filter.Q.value     = 1.2;
+
+            // Envelope de amplitude: ataque instantâneo, decay rápido
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
+
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            source.start(now);
+            source.stop(now + 0.04);
+        } catch(e) {}
+    }
+
+    // Clique mais grave de "Enter" ao fim de cada linha
+    function playLineEnd() {
+        try {
+            const ctx    = getAudioCtx();
+            const now    = ctx.currentTime;
+
+            const bufSize = Math.floor(ctx.sampleRate * 0.06);
+            const buffer  = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data    = buffer.getChannelData(0);
+            for (let j = 0; j < bufSize; j++) data[j] = Math.random() * 2 - 1;
+
+            const source  = ctx.createBufferSource();
+            source.buffer = buffer;
+
+            const filter       = ctx.createBiquadFilter();
+            filter.type        = 'bandpass';
+            filter.frequency.value = 1200;
+            filter.Q.value     = 1.2;
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+
+            source.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+
+            source.start(now);
+            source.stop(now + 0.06);
+        } catch(e) {}
+    }
+
+    // Beep especial para "SISTEMA PRONTO" — acorde rápido ascendente
+    function playReadyChime() {
+        try {
+            const ctx   = getAudioCtx();
+            const notes = [330, 440, 550, 660];
+            notes.forEach((freq, i) => {
+                const osc  = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+
+                const t = ctx.currentTime + i * 0.09;
+                gain.gain.setValueAtTime(0.07, t);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+                osc.start(t);
+                osc.stop(t + 0.25);
+            });
+        } catch(e) {}
+    }
+
+    // Som de game over — descida grave + ruído de colapso
+    function playGameOver() {
+        try {
+            const ctx = getAudioCtx();
+            const now = ctx.currentTime;
+
+            // 1) Acorde descendente sinistro (5 notas caindo)
+            const notes = [440, 370, 311, 261, 220];
+            notes.forEach((freq, i) => {
+                const osc  = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.frequency.value = freq;
+                osc.type = 'sawtooth';
+
+                const t = now + i * 0.22;
+                gain.gain.setValueAtTime(0.0, t);
+                gain.gain.linearRampToValueAtTime(0.09, t + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+                osc.start(t);
+                osc.stop(t + 0.6);
+            });
+
+            // 2) Ruído de "crash" — burst de noise logo no início
+            const bufSize   = ctx.sampleRate * 0.4;
+            const buffer    = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+            const data      = buffer.getChannelData(0);
+            for (let j = 0; j < bufSize; j++) data[j] = (Math.random() * 2 - 1);
+
+            const noise     = ctx.createBufferSource();
+            noise.buffer    = buffer;
+
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.18, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+            noise.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+            noise.start(now);
+            noise.stop(now + 0.4);
+
+            // 3) Tom grave e longo de "morte" (~110 Hz, dura ~2.5s)
+            const drone     = ctx.createOscillator();
+            const droneGain = ctx.createGain();
+            drone.connect(droneGain);
+            droneGain.connect(ctx.destination);
+
+            drone.frequency.value = 110;
+            drone.type = 'sine';
+
+            const t0 = now + 0.5;
+            droneGain.gain.setValueAtTime(0.0, t0);
+            droneGain.gain.linearRampToValueAtTime(0.1, t0 + 0.3);
+            droneGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.5);
+            drone.start(t0);
+            drone.stop(t0 + 2.6);
+
+        } catch(e) {}
+    }
+
+    // Digita o texto da linha caractere a caractere com som
+    function typeLineWithSound(el, text, onDone) {
+        let i = 0;
+        const speed = 28; // ms por caractere
+        function nextChar() {
+            if (i < text.length) {
+                el.textContent = text.slice(0, i + 1);
+                // Toca beep a cada 2 caracteres para não saturar
+                if (i % 2 === 0) playTypeBeep();
+                i++;
+                setTimeout(nextChar, speed + Math.random() * 18);
+            } else {
+                playLineEnd();
+                if (onDone) onDone();
+            }
+        }
+        nextChar();
+    }
+
+    let lineIndex = 0;
+
+    function addSplashLine() {
+        if (lineIndex >= splashLines.length) {
+            playReadyChime();
+            setTimeout(() => {
+                btnEl.style.display  = 'inline-block';
+                warnEl.style.display = 'block';
+            }, 500);
+            return;
+        }
+
+        const isLast = lineIndex === splashLines.length - 1;
+        const text   = splashLines[lineIndex];
+
+        const div = document.createElement('div');
+        div.className = 'splash-loading-line';
+        div.style.animationDelay = '0s';
+        div.textContent = '';
+        logEl.appendChild(div);
+
+        const pct = Math.round(((lineIndex + 1) / splashLines.length) * 100);
+        barEl.style.width = pct + '%';
+
+        lineIndex++;
+
+        // Digita a linha com som, depois agenda a próxima
+        typeLineWithSound(div, text, () => {
+            const pause = isLast ? 300 : 180 + Math.random() * 200;
+            setTimeout(addSplashLine, pause);
+        });
+    }
+
+    function activateAudio() {
+        // Desbloqueia o Web Audio Context com interação do usuário
+        getAudioCtx();
+
+        // Troca tela 1 → tela 2
+        document.getElementById('splash-activate').style.display = 'none';
+        document.getElementById('splash-modal').style.display    = 'block';
+
+        // Pequeno beep de confirmação de ativação
+        try {
+            const ctx  = getAudioCtx();
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 660; osc.type = 'sine';
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.2);
+        } catch(e) {}
+
+        // Inicia a digitação do loading
+        setTimeout(addSplashLine, 300);
+    }
+
+    function startGame() {
+        // Tenta fazer autoplay do Spotify (só funciona pós-interação do usuário)
+        const overlay = document.getElementById('splash-overlay');
+        overlay.classList.add('fade-out');
+        setTimeout(() => { overlay.style.display = 'none'; }, 850);
+
+        // Mostra e tenta dar play no iframe do Spotify imediatamente
+        const audioModule = document.getElementById('audio-module');
+        audioModule.classList.remove('hidden');
+        audioActivated = true;
+
+        // Força o autoplay injetando &autoplay=1 na URL do iframe
+        const iframe = audioModule.querySelector('iframe');
+        if (iframe) {
+            const src = iframe.src;
+            if (!src.includes('autoplay=1')) {
+                iframe.src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+            }
+        }
+    }
+    // ── FIM SPLASH ────────────────────────────────────────────────────
+
     // Inicializar jogo
     updateMetrics();
     loadNode();
 </script>
 </body>
 </html>
+
 
