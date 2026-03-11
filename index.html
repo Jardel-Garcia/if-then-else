@@ -454,7 +454,7 @@
         <div class="header-top">
             <div>
                 <span class="icon">▶</span>
-                <span style="font-size: 12px;">SISTEMA_OPERACIONAL_VITAL.exe</span>
+                <span style="font-size: 12px;">SIST_OP_VITAL.exe</span>
             </div>
             <div id="humanity-display">
                 <span class="icon">♥</span>
@@ -586,7 +586,7 @@
             ]
         },
         drive_work: {
-            text: `> CHEGADA: EMPRESA\n> INÍCIO DE MÊS DETECTADO\n> PROTOCOLO: AVALIAÇÃO\n\nVocê verifica seu e-mail.\nRelatório de ponto: ⭐⭐⭐⭐½\n\n> DECEPÇÃO.EXE RODANDO...\n\nPrecisa sair 1 minuto mais cedo hoje para acertar o ponto.\nMas primeiro: vai ter depuração de gente.`,
+            text: `> CHEGADA: EMPRESA\n> ESTACIONAMENTO: ESCOLHER MELHOR VAGA\n> VAGA MAIS PRÓXIMA: STATUS = INDISPONÍVEL\n> INÍCIO DE MÊS DETECTADO\n> PROTOCOLO: AVALIAÇÃO\n\nVocê verifica seu e-mail.\nRelatório de ponto: ⭐⭐⭐⭐½\n\n> DECEPÇÃO.EXE RODANDO...\n\nPrecisa sair 1 minuto mais cedo hoje para acertar o ponto.\nMas primeiro: vai ter depuração de gente.`,
             choices: [
                 { text: 'OBSERVAR: Demissões pela sala de vidro', next: 'watch_firing', effect: { humanity: -15, clicks: 200 } }
             ]
@@ -605,7 +605,7 @@
             ]
         },
         iara_meet: {
-            text: `> ENVIANDO MENSAGEM PARA ESPOSA: "Vou fazer hora extra"\n> AJUSTANDO TIMER: 30 MINUTOS\n> INICIANDO PROTOCOLO...\n\nVocê pula algumas partes. Vai direto pra recursão.\nIara gosta, você sabe.\nSe cansa antes do ponto de parada.\n\nO timer toca. Iara desce sem falar nada.\nMelhor assim.`,
+            text: `> ENVIANDO MENSAGEM PARA ESPOSA: "Vou fazer hora extra"\n> LOCALIZAÇÃO ATUALIZADA: MOTEL "UNDEFINED"\n> AJUSTANDO TIMER: 30 MINUTOS\n> INICIANDO PROTOCOLO...\n\nVocê pula algumas partes. Vai direto pra recursão.\nIara gosta, você sabe.\nSe cansa antes do ponto de parada.\n\nO timer toca. Iara desce sem falar nada.\nMelhor assim.`,
             choices: [
                 { text: 'RETURN: para_casa()', next: 'dinner_scene', effect: { humanity: -10, clicks: 100 } }
             ]
@@ -636,7 +636,7 @@
             ]
         },
         midnight_work: {
-            getText: () => `> DIA ${getDayText()}\n> ${23 + Math.floor(Math.random() * 2)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}\n\nSua esposa vem te chamar. Você diz:\n"Dormir 8 horas é perder um terço da vida."\n"O meu maior medo é que a gente não dure", ela responde.\n\n> SENTIMENTALISMO DETECTADO\n> IGNORANDO...\n\n${metrics.bugs > 0 ? 'O bug ainda resiste.' : 'Você está próximo da solução.'}`,
+            getText: () => `> DIA ${getDayText()}\n> ${23 + Math.floor(Math.random() * 2)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}\n\nSua esposa vem te chamar. Você diz:\n"Dormir 8 horas é perder um terço da vida."\n"O meu maior medo é que a gente não dure", ela responde.\n\n> SENTIMENTALISMO DETECTADO\n> INGRATIDÃO DETECTADA\n> IGNORANDO...\n\n${metrics.bugs > 0 ? 'O bug ainda resiste.' : 'Você está próximo da solução.'}`,
             get text() { return this.getText(); },
             get choices() { return [
                 { text: metrics.bugs > 0 ? 'USAR: ferramentas_IA()' : 'CONTINUAR: até_resolver()', next: metrics.bugs > 0 ? 'ai_solution' : 'day_loop', effect: { clicks: 400, days: 1, humanity: -8 } }
@@ -672,19 +672,26 @@
             ]
         },
         meta_day: {
-            text: `> DIA 14\n> VERIFICANDO SCORE...\n> META: 15 DIAS\n> VOCÊ FIXOU: 14 DIAS\n\nNinguém pediu. Mas você fixou.\nOs números confirmam: você conseguiu.\nOlhares invejosos na sala de café.\n\n> FUNCIONÁRIO OURO ✓\n\nVocê está eufórico.\nMerece até 10 minutos a mais com Iara.\n\nMas à noite, algo está errado.`,
+            text: `> DIA 14\n> VERIFICANDO SCORE...\n> META: 15 DIAS\n> VOCÊ FIXOU: 14 DIAS\n\nNinguém pediu. Mas você fixou.\nOs números vão confirmar: você vai conseguir.\nOlhares invejosos na sala de café.\n\n> FUNCIONÁRIO OURO ✓\n\nVocê está eufórico.\nMerece até 10 minutos a mais com Iara.\n\nMas algo está errado.`,
             choices: [
-                { text: 'CONTINUAR: celebration()', next: 'breakdown', effect: { clicks: 3000, humanity: -10 } }
+                { text: 'CONTINUAR: protocolo_iara()', next: 'iara_ten_minutes', effect: { clicks: 3000, humanity: -10 } },
+				{ text: 'CONTINUAR: verificarStatus()', next: 'breakdown', effect: { clicks: 6000, humanity: -10 } }
+            ]
+        },
+		iara_ten_minutes: {
+            text: `> AÇÃO: RETIRAR ROUPAS\n Iara parece até mais bonita hoje.\n\n> DEIXAR ELA TE SATISFAZER? : S\nEu mereço. Desajeitada, sem classe, mas sabe fazer o que preciso.\n\n+10 minutos\n\nFIM. \nIR PARA: PONTO DE ÔNIBUS`,
+            choices: [
+                { text: 'EXECUTAR: ir_para_casa()', next: 'try_change', effect: { clicks: 5000, humanity: -15 } }
             ]
         },
         breakdown: {
-            text: `> ERRO: TONTURA CRÍTICA\n> AVISO: SISTEMA INSTÁVEL\n> ALERTA: SOBRECARGA\n\nA sala gira.\nVocê se apoia na mesa.\nQuatro comprimidos de uma vez.\nRespirações do influenciador.\n\nSe recostar um pouco?\nVocê deita.\nFecha os olhos.\n\nE a solução do bug vem!\nComo mágica!\n\nVocê se levanta rápido.\nRápido demais.`,
+            text: `> ERRO: TONTURA CRÍTICA\n> AVISO: SISTEMA INSTÁVEL\n> ALERTA: SOBRECARGA\nVocê clica no botão Atualizar. 1x, 2x, 3x. NADA. \n RH incompetente. Suas costas suam.\nA sala gira.\nVocê se apoia na mesa.\nQuatro comprimidos de uma vez.\nRespirações do influenciador.\n\nINICIAR LOOP: você circula a sala, loop infinito. \n\n 08:02. Droga, querem me fazer uma surpresa, só pode ser.\n 08:03. 📧. Chegou!\n Clique. Clique. Clique. Suor. Clique. Suor.\n\nDESABOTOAR CAMISA\nBATIMENTOS++`,
             choices: [
-                { text: 'EXECUTAR: abrir_notebook()', next: 'collapse', effect: { clicks: 5000, humanity: -15 } }
+                { text: 'EXECUTAR: insisitir_abrir_email()', next: 'collapse', effect: { clicks: 5000, humanity: -15 } }
             ]
         },
         collapse: {
-            text: `> SISTEMA CRÍTICO\n> FREQUÊNCIA CARDÍACA: ${180 + Math.floor(Math.random() * 40)} BPM\n> VISÃO: COMPROMETIDA\n> EQUILÍBRIO: FALHA\n\nVocê vê vultos borrados.\nAlguém bate no vidro.\n"Bando de gente chata!"\n\nO e-mail abre.\nVocê vê de relance—\n\n> > > CONEXÃO PERDIDA < < <\n\nCâmera lenta.\nCorpo contra o chão.\nVozes abafadas.\nImagens de TV antiga.\n\n> SUA PILHA ESTOUROU`,
+            text: `> SISTEMA CRÍTICO\n> FREQUÊNCIA CARDÍACA: ${180 + Math.floor(Math.random() * 40)} BPM\n> VISÃO: COMPROMETIDA\n> EQUILÍBRIO: FALHA\n\nVocê vê vultos borrados.\nAlguém bate no vidro.\n"Bando de gente chata, me deixem em paz!"\n\nO e-mail abre.\nVocê vê de relance-—---\nUm borrão na diagonal. Queda livre.\n> > > CONEXÃO PERDIDA < < <\n\nCâmera lenta.\nCorpo contra o chão.\nVozes abafadas.\nImagens de TV antiga.\n\n> SUA PILHA ESTOUROU`,
             choices: [
                 { text: 'EXECUTAR: reiniciar()', next: 'restart_ending', effect: {} }
             ]
@@ -815,7 +822,7 @@
 
     // ── SPLASH SCREEN ────────────────────────────────────────────────
     const splashLines = [
-        '> CARREGANDO SISTEMA_OPERACIONAL_VITAL.exe...',
+        '> CARREGANDO SIST_OP_VITAL.exe...',
         '> ALOCANDO MEMÓRIA: rotina_diaria[]',
         '> COMPILANDO: protocolo_se_entao_senao.c',
         '> VERIFICANDO DEPENDÊNCIAS: cafe, ansiedade, ambicao',
@@ -1093,5 +1100,3 @@
 </script>
 </body>
 </html>
-
-
