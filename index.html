@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Se-então-senão: conto interativo</title>
+
+    <!-- Metadados bibliográficos -->
+    <meta name="author"       content="Jardel Lucas Garcia">
+    <meta name="publisher"    content="Editora Coletivo Cine-Fórum">
+    <meta name="copyright"    content="© 2026 Jardel Lucas Garcia. Todos os direitos reservados.">
+    <meta name="description"  content="Se-então-senão: conto interativo. Uma narrativa jogável sobre produtividade, desumanização e colapso. Autor: Jardel Lucas Garcia. Editora Coletivo Cine-Fórum, 2026.">
+    <meta name="keywords"     content="conto interativo, literatura digital, narrativa jogável, Jardel Lucas Garcia, Cineforum, ficção brasileira">
+    <meta name="isbn"         content="em vias de registro">
+    <meta name="dc.title"     content="Se-então-senão">
+    <meta name="dc.creator"   content="Jardel Lucas Garcia">
+    <meta name="dc.publisher" content="Editora Coletivo Cine-Fórum">
+    <meta name="dc.date"      content="2026">
+    <meta name="dc.type"      content="obra interativa digital">
+    <meta name="dc.format"    content="text/html">
+    <meta name="dc.language"  content="pt-BR">
+    <meta name="dc.rights"    content="Todos os direitos reservados. Reprodução proibida sem autorização prévia do autor.">
+    <meta property="og:title"       content="Se-então-senão — conto interativo">
+    <meta property="og:description" content="Uma narrativa jogável sobre produtividade, desumanização e colapso. Por Jardel Lucas Garcia.">
+    <meta property="og:type"        content="website">
+    <meta property="og:locale"      content="pt_BR">
     <script>
         (function() {
             const canvas = document.createElement('canvas');
@@ -340,7 +360,7 @@
             flex-direction: column;
             align-items: center;
             margin: 8px 0 4px;
-            opacity: 0.75;
+            opacity: 0.7;
         }
         .cineforum-wrap-footer svg {
             filter: drop-shadow(0 0 3px #0f0) drop-shadow(0 0 6px rgba(0,255,0,0.3));
@@ -348,9 +368,50 @@
         .cineforum-label-footer {
             font-size: 8px;
             letter-spacing: 3px;
-            color: rgba(0, 255, 0, 0.45);
+            color: #0f0;
             text-transform: uppercase;
             margin-top: 3px;
+        }
+
+        /* ── TOGGLES DO RODAPÉ ── */
+        .toggle-item {
+            border-top: 1px solid rgba(0,255,0,0.15);
+            margin-top: 6px;
+        }
+        .toggle-header {
+            width: 100%;
+            background: none;
+            border: none;
+            color: rgba(0,255,0,0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            text-align: left;
+            padding: 10px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+        .toggle-header:hover {
+            color: #0f0;
+        }
+        .toggle-arrow {
+            font-size: 9px;
+            transition: transform 0.25s ease;
+            display: inline-block;
+        }
+        .toggle-arrow.open {
+            transform: rotate(90deg);
+        }
+        .toggle-body {
+            display: none;
+            padding: 4px 0 14px 18px;
+            animation: fadeInLine 0.3s forwards;
+        }
+        .toggle-body.open {
+            display: block;
         }
 
         /* ── PROTEÇÃO DE CONTEÚDO ── */
@@ -510,7 +571,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>SE-ENTÃO-SENÃO © 2025 | Baseado no conto de mesmo nome por Jardel Garcia < <a
+        <p>SE-ENTÃO-SENÃO © 2026 | Baseado no conto de mesmo nome por Jardel Lucas Garcia < <a
                 href="https://linktr.ee/_jardelgarcia_" target="_blank">@_jardelgarcia_</a> > </p>
         <div class="cineforum-wrap-footer">
             <svg width="36" height="38" viewBox="0 0 100 105" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -551,18 +612,67 @@
             <div class="cineforum-label-footer">EDITORA COLETIVO CINE-FORUM</div>
         </div>
         <br>
-        <div id="audio-module" class="hidden">
-            <div class="audio-module">
-                <div>> MÓDULO_DE_ÁUDIO.carregado</div>
-                <div>> Trilha recomendada para execução da narrativa</div>
-                <iframe style="border-radius:12px;margin-top:10px;"
-                        data-testid="embed-iframe"
-                        src="https://open.spotify.com/embed/album/6ldSMLVCxIzdVXuLspsDJo?utm_source=generator&theme=0"
-                        width="100%" height="152" frameBorder="0" allowfullscreen=""
-                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                        loading="lazy"></iframe>
+
+        <!-- Toggles do rodapé -->
+        <div id="footer-toggles" class="hidden" style="margin-top: 10px;">
+
+            <!-- Toggle 1: Trilha sonora -->
+            <div class="toggle-item">
+                <button class="toggle-header" onclick="toggleSection('audio-section', this)">
+                    <span class="toggle-arrow">▶</span>
+                    <span>> MÓDULO_DE_ÁUDIO — uma referência musical que inspirou este conto</span>
+                </button>
+                <div id="audio-section" class="toggle-body">
+                    <div style="font-size:11px; color:rgba(0,255,0,0.5); margin-bottom:8px;">
+                        > Trilha que inspirou e acompanha a narrativa
+                    </div>
+                    <iframe style="border-radius:8px;"
+                            src="https://open.spotify.com/embed/album/6ldSMLVCxIzdVXuLspsDJo?utm_source=generator&theme=0"
+                            width="100%" height="152" frameBorder="0" allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy"></iframe>
+                </div>
             </div>
+
+            <!-- Toggle 2: Ficha catalográfica -->
+            <div class="toggle-item">
+                <button class="toggle-header" onclick="toggleSection('catalog-section', this)">
+                    <span class="toggle-arrow">▶</span>
+                    <span>> FICHA_CATALOGRÁFICA — autoria e registro</span>
+                </button>
+                <div id="catalog-section" class="toggle-body">
+                    <div style="font-size:10px; color:rgba(0,255,0,0.4); line-height:1.9; text-align:left;">
+                        <div>GARCIA, Jardel Lucas</div>
+                        <div style="padding-left:18px;">Se-então-senão : conto interativo / Jardel Lucas Garcia. —</div>
+                        <div style="padding-left:18px;">Belo Horizonte : Editora Coletivo Cine-Fórum, 2026.</div>
+                        <div style="padding-left:18px;">Obra interativa digital (HTML).</div>
+                        <div style="margin-top:4px;">ISBN (em vias de registro)</div>
+                        <div style="margin-top:4px;">1. Ficção brasileira. 2. Literatura digital. 3. Narrativa interativa. I. Título.</div>
+                        <div style="margin-top:10px; color:rgba(0,255,0,0.25); font-size:9px;">
+                            © 2026 Jardel Lucas Garcia. Todos os direitos reservados.<br>
+                            Reprodução proibida sem autorização prévia do autor e da editora.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggle 3: Conto original -->
+            <div class="toggle-item">
+                <button class="toggle-header" onclick="toggleSection('story-section', this)">
+                    <span class="toggle-arrow">▶</span>
+                    <span>> CONTO_ORIGINAL — ler o texto que originou o jogo</span>
+                </button>
+                <div id="story-section" class="toggle-body">
+                    <div style="font-size:11px; color:rgba(0,255,0,0.4); line-height:1.8;">
+                        > STATUS: PUBLICAÇÃO EM BREVE<br>
+                        > O conto literário original estará disponível em:<br>
+                        <span style="color:rgba(0,255,0,0.25); font-style:italic;">[ link será adicionado após publicação ]</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
     </div>
 </div>
 </div>
@@ -612,7 +722,7 @@ choices: [
 ]
 },
 drive_work: {
-text: `> CHEGADA: EMPRESA\n> ESTACIONAMENTO: ESCOLHER MELHOR VAGA\n> VAGA MAIS PRÓXIMA: STATUS = INDISPONÍVEL\n> INÍCIO DE MÊS DETECTADO\n> PROTOCOLO: AVALIAÇÃO\n\nVocê verifica seu e-mail.\nRelatório de ponto: ⭐⭐⭐⭐½\n\n> DECEPÇÃO.EXE RODANDO...\n\nPrecisa sair 1 minuto mais cedo hoje para acertar o ponto.\nMas primeiro: vai ter depuração de gente.`,
+text: `> CHEGADA: EMPRESA\n> ESTACIONAMENTO: ESCOLHER MELHOR VAGA\n> VAGA MAIS PRÓXIMA: STATUS = INDISPONÍVEL\n> INÍCIO DE MÊS DETECTADO\n> PROTOCOLO: AVALIAÇÃO\n\nVocê verifica seu e-mail.\nRelatório de ponto: ⭐⭐⭐⭐½\n\n> DECEPÇÃO.EXE RODANDO...\n\nPrecisa sair 1 minuto mais cedo hoje para acertar o ponto.\nMas primeiro: "vai ter depuração de gente."`,
 choices: [
 { text: 'OBSERVAR: Demissões pela sala de vidro', next: 'watch_firing', effect: { humanity: -15, clicks: 200 } }
 ]
@@ -631,7 +741,7 @@ choices: [
 ]
 },
 iara_meet: {
-text: `> ENVIANDO MENSAGEM PARA ESPOSA: "Vou fazer hora extra"\n> LOCALIZAÇÃO ATUALIZADA: MOTEL "UNDEFINED"\n> AJUSTANDO TIMER: 30 MINUTOS\n> INICIANDO PROTOCOLO...\n\nVocê pula algumas partes. Vai direto pra recursão.\nIara gosta, você sabe.\nSe cansa antes do ponto de parada.\n\nO timer toca. Iara desce sem falar nada.\nMelhor assim.`,
+text: `> ENVIANDO MENSAGEM PARA ESPOSA: "Vou fazer hora extra"\n> LOCALIZAÇÃO ATUALIZADA: MOTEL "UNDEFINED"\n> AJUSTANDO TIMER: 30 MINUTOS\n> INICIANDO PROTOCOLO...\n\nVocê pula algumas partes. Vai direto pra recursão.\n\nwhile(t<30){\n\tinsert++;\n\tspeed++;\n}\n\nIara gosta, você tem certeza.\nSe cansa antes do ponto de parada.\n\nO timer toca. Iara desce sem falar nada.\n"Melhor assim."`,
 choices: [
 { text: 'RETURN: para_casa()', next: 'dinner_scene', effect: { humanity: -10, clicks: 100 } }
 ]
@@ -679,7 +789,7 @@ getText: () => `> DIA ${getDayText()}\n> ROTINA.EXE EXECUTANDO...\n\nMesmo janta
 get text() { return this.getText(); },
 get choices() { return metrics.days < 14 ? [
 { text: 'LOOP: repetir()', next: 'day_loop', effect: { clicks: 2000, days: +1, humanity: -5 } },
-{ text: 'TRY: tentar_mudança()', next: 'try_change', effect: { humanity: -8 } }
+{ text: 'TRY: tentar_mudanca()', next: 'try_change', effect: { humanity: -8 } }
 ] : [
 { text: 'VERIFICAR: meta_status()', next: 'meta_day', effect: { clicks: 1000, humanity: -5 } }
 ]; }
@@ -687,12 +797,12 @@ get choices() { return metrics.days < 14 ? [
 try_change: {
 text: `> TENTANDO NOVO FLUXO...\n> DESVIO DO PROTOCOLO PADRÃO\n\nVocê elogia a comida.\nAcaricia a mão dela.\nEla te olha séria, desconfiada.\n\nMas você vê: ela gostou.\n\nMais tarde, você a abraça por trás.\nO corpo rígido se amolece.\nEla pousa a cabeça no seu ombro.\n\nFicam assim. Tempo demais pro seu gosto.\n\nAí ela sente o perfume de Iara.`,
 choices: [
-{ text: 'EXECUTAR: explicação()', next: 'confrontation', effect: { humanity: -15 } },
+{ text: 'EXECUTAR: explicacao()', next: 'confrontation', effect: { humanity: -15 } },
 { text: 'ABORT: sem_resposta()', next: 'confrontation', effect: { humanity: -20 } }
 ]
 },
 confrontation: {
-text: `> SISTEMA EM CONFLITO\n\n"Quem é a vagabunda dessa vez?!"\n\nVocê tira a camisa. Batom. Perfume.\n"Nosso casamento parece um filme ruim", ela diz.\n"Sabe o que é pior? Eu te amei esse tempo todo achando que você se importaria."\n\nVocê conta alguns segundos:\n"Só tem um erro de sintaxe na sua frase.\nVocê não precisa me amar o tempo todo."\n\nEla balança a cabeça. Banho. Remédios. Dorme.\n\n> PROTOCOLO MANTIDO\n> MUDANÇA: CANCELADA`,
+text: `> SISTEMA EM CONFLITO\n\n"Quem é a vagabunda dessa vez?!"\n\nVocê tira a camisa. Batom. Perfume.\n"Nosso casamento parece um filme ruim", ela diz.\n"Sabe o que é pior? Eu te amei esse tempo todo achando que você se importaria."\n\nVocê conta alguns segundos antes de dizer:\n"Só tem um erro de sintaxe na sua frase.\nVocê não precisa me amar o tempo todo."\n\nEla balança a cabeça. Banho. Remédios. Dorme.\n\n> PROTOCOLO MANTIDO\n> MUDANÇA: CANCELADA`,
 choices: [
 { text: 'CONTINUAR: ao_trabalho()', next: 'meta_day', effect: { humanity: -25, days: 1 } }
 ]
@@ -705,13 +815,13 @@ choices: [
 ]
 },
 iara_ten_minutes: {
-text: `> AÇÃO: RETIRAR ROUPAS\n Iara parece até mais bonita hoje.\n\n> DEIXAR ELA TE SATISFAZER? : S\nEu mereço. Desajeitada, sem classe, mas sabe fazer o que preciso.\n\n+10 minutos\n\nFIM. \nIR PARA: PONTO DE ÔNIBUS`,
+text: `> AÇÃO: RETIRAR ROUPAS\n Iara parece até mais bonita hoje.\n\n> DEIXAR ELA TE SATISFAZER? : S\n"Eu mereço. Desajeitada, sem classe, mas sabe fazer o que preciso."\n\n+10 minutos\n\nFIM. \nIR PARA: PONTO DE ÔNIBUS`,
 choices: [
 { text: 'EXECUTAR: ir_para_casa()', next: 'try_change', effect: { clicks: 5000, humanity: -15 } }
 ]
 },
 breakdown: {
-text: `> ERRO: TONTURA CRÍTICA\n> AVISO: SISTEMA INSTÁVEL\n> ALERTA: SOBRECARGA\nVocê clica no botão Atualizar. 1x, 2x, 3x. NADA. \n RH incompetente. Suas costas suam.\nA sala gira.\nVocê se apoia na mesa.\nQuatro comprimidos de uma vez.\nRespirações do influenciador.\n\nINICIAR LOOP: você circula a sala, loop infinito. \n\n 08:02. Droga, querem me fazer uma surpresa, só pode ser.\n 08:03. 📧. Chegou!\n Clique. Clique. Clique. Suor. Clique. Suor.\n\nDESABOTOAR CAMISA\nBATIMENTOS++`,
+text: `> ERRO: TONTURA CRÍTICA\n> AVISO: SISTEMA INSTÁVEL\n> ALERTA: SOBRECARGA\n\nChegou o dia da promoção, mas o RH ainda não enviou o e-mail.\nVocê clica no botão Atualizar. 1x, 2x, 3x. NADA. \n "RH incompetente." Suas costas suam.\nA sala gira.\nVocê se apoia na mesa.\nQuatro comprimidos de uma vez.\nRespirações do influenciador.\n\nINICIAR LOOP: você circula a sala, loop infinito. \n\n 08:02. Droga, querem me fazer uma surpresa, só pode ser.\n 08:03. 📧. Chegou!\n Clique. Clique. Clique. Suor. Clique. Suor.\n\nDESABOTOAR CAMISA\nBATIMENTOS++`,
 choices: [
 { text: 'EXECUTAR: insistir_abrir_email()', next: 'collapse', effect: { clicks: 5000, humanity: -15 } }
 ]
@@ -723,7 +833,7 @@ choices: [
 ]
 },
 restart_ending: {
-text: `> REINICIANDO SISTEMA...\n> CARREGANDO ROTINA...\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\n...\n\nVocê acorda.\nO despertador marca 05:00.\n\nTudo de novo.\nE de novo.\nE de novo.\nE de novo.\n\n> LOOP INFINITO DETECTADO\n> NÃO HÁ BREAK\n> NÃO HÁ RETURN\n> SÓ REPEAT\n\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n☠ ☠ ☠  FATAL ERROR  ☠ ☠ ☠\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n\n�\x00\x00HEAP\x00DUMP\x00\x00█▓░\n✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝\n\n0xDEAD • 0xDEAD • 0xDEAD\n\n█▀▄▀█ ▄▀▀▄ █▀▀▄ ▀▀█▀▀\n▒░▒░▒░▒░▒░▒░▒░▒░▒░▒░▒\n\n         †\n\n> PROCESSO ENCERRADO\n> MEMÓRIA LIBERADA\n> USUÁRIO: NÃO ENCONTRADO`,
+text: `> REINICIANDO SISTEMA...\n> CARREGANDO ROTINA...\n> PROTOCOLO: SE-ENTÃO-SENÃO\n\n...\n\nVocê acorda.\nO despertador marca 05:00.\n\nTudo de novo.\nE de novo.\nE de novo.\nE de novo.\n\n> LOOP INFINITO DETECTADO\n> NÃO HÁ BREAK\n> NÃO HÁ RETURN\n> SÓ REPEAT\n\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n☠ ☠ ☠  FATAL ERROR  ☠ ☠ ☠\n▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n\n�\x00\x00HEAP\x00DUMP\x00\x00█▓░\n✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝ ✝\n\n0xDEAD • 0xDEAD • 0xDEAD\n\n█▀▄▀█ ▄▀▀▄ █▀▀▄ ▀▀█▀▀ █▀▀\n▒░▒░▒░▒░▒░▒░▒░▒░▒░▒░▒\n\n         †\n\n> PROCESSO ENCERRADO\n> MEMÓRIA LIBERADA\n> USUÁRIO: NÃO ENCONTRADO`,
 choices: []
 }
 };
@@ -1020,16 +1130,15 @@ function startGame() {
 const overlay = document.getElementById('splash-overlay');
 overlay.classList.add('fade-out');
 setTimeout(() => { overlay.style.display = 'none'; }, 850);
-const audioModule = document.getElementById('audio-module');
-audioModule.classList.remove('hidden');
 audioActivated = true;
-const iframe = audioModule.querySelector('iframe');
-if (iframe) {
-const src = iframe.src;
-if (!src.includes('autoplay=1')) {
-iframe.src = src + (src.includes('?') ? '&' : '?') + 'autoplay=1';
+document.getElementById('footer-toggles').classList.remove('hidden');
 }
-}
+function toggleSection(id, btn) {
+const body = document.getElementById(id);
+const arrow = btn.querySelector('.toggle-arrow');
+const isOpen = body.classList.contains('open');
+body.classList.toggle('open', !isOpen);
+arrow.classList.toggle('open', !isOpen);
 }
 updateMetrics();
 loadNode();
@@ -1057,13 +1166,12 @@ return false;
 (function() {
 const meta = document.createElement('meta');
 meta.name = 'author';
-meta.content = 'Jardel Garcia — SE-ENTÃO-SENÃO © 2025. Todos os direitos reservados. Reprodução proibida sem autorização.';
+meta.content = 'Jardel Lucas Garcia — SE-ENTÃO-SENÃO © 2026. Todos os direitos reservados. Reprodução proibida sem autorização.';
 document.head.appendChild(meta);
 const copy = document.createElement('meta');
 copy.name = 'copyright';
-copy.content = 'Jardel Garcia, 2025';
+copy.content = 'Jardel Lucas Garcia, 2026';
 document.head.appendChild(copy);
 })();</script>
 </body>
 </html>
-
